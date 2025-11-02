@@ -72,8 +72,21 @@ public:
         strcpy_s(this->text, strlen(other.text) + 1, other.text);
         return *this;
     }
-};
+    //Перевантаженя оператора []
+    char& operator[](size_t index) {
+        if (index >= strlen(text)) {
+            cout<<"Error";
+        }
+        return text[index];
+    }
+    const char& operator[](size_t index) const {
+        if (index >= strlen(text)) {
+            cout << "Error";
+        }
+        return text[index];
+    }
 
+};
 
 int main() {
     SetConsoleOutputCP(1251);
@@ -98,9 +111,18 @@ int main() {
     cout << "move: " << move << endl;
     move = std::move(s1);
     cout << "Moved: " << move << endl;
-    cout << "a";
-}
+    //3
+    String testStr("Hello");
+    cout << "До зміни: " << testStr << endl;
+    testStr[0] = 'h';
+    testStr[1] = 'E';
+    cout << "Після зміни: " << testStr << endl;
+    const String constStr("Constant");
+    cout << "Константний рядок: " << constStr << endl;
+    cout << "Перший символ: " << constStr[0] << endl;
+    cout << "Останній символ: " << constStr[constStr.size() - 1] << endl;
 
+}
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
 // Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
