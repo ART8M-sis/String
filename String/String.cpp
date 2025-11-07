@@ -10,7 +10,12 @@ class String {
 private:
     char* text;
 public:
-    // Конструктор
+    // Конструктор за замовчуванням
+    String() {
+        text = new char[1];
+        text[0] = '\0';
+    }
+    // Конструктор за замовчуванням
     String(const char* text) {
         this->text = new char[strlen(text) + 1];
         strcpy_s(this->text, strlen(text) + 1, text);
@@ -86,7 +91,96 @@ public:
         return text[index];
     }
 
+    // replace - замінює вказану кількість символів починаючи зі вказаного індексу на переданий рядок
+    String& replace(size_t index, size_t count, const String& str) {
+        size_t oldLen = strlen(text);
+        if (index > oldLen) {
+            throw out_of_range("Index out of range");
+        }
+
+        size_t actualCount = count;
+        if (index + count > oldLen) {
+            actualCount = oldLen - index;
+        }
+
+        size_t newLen = oldLen - actualCount + strlen(str.text);
+        char* newText = new char[newLen + 1];
+
+        strncpy_s(newText, newLen + 1, text, index);
+        newText[index] = '\0';
+
+        strcat_s(newText, newLen + 1, str.text);
+
+        strcat_s(newText, newLen + 1, text + index + actualCount);
+
+        delete[] text;
+        text = newText;
+
+        return *this;
+    }
+
+    // substr - повертає копію підрядка між двома індексами
+    String substr(size_t start, size_t length) const {
+        size_t strLen = strlen(text);
+
+        if (start >= strLen) {
+            throw out_of_range("Start index out of range");
+        }
+
+        size_t actualLength = length;
+        if (start + length > strLen) {
+            actualLength = strLen - start;
+        }
+
+        char* sub = new char[actualLength + 1];
+        strncpy_s(sub, actualLength + 1, text + start, actualLength);
+        sub[actualLength] = '\0';
+
+        String result(sub);
+        delete[] sub;
+        return result;
+    }
+
+    // substr - перевантаження з одним параметром (до кінця рядка)
+    String substr(size_t start) const {
+        return substr(start, strlen(text) - start);
+    }
+
+    // empty - повертає true якщо в рядку нема символів, false - якщо є
+    bool empty() const {
+        return size() == 0;
+    }
+
+    // insert - вставляє зазначений рядок на зазначений індекс
+    String& insert(size_t index, const String& str) {
+        size_t oldLen = strlen(text);
+
+        if (index > oldLen) {
+            throw out_of_range("Index out of range");
+        }
+
+        size_t newLen = oldLen + strlen(str.text);
+        char* newText = new char[newLen + 1];
+
+        strncpy_s(newText, newLen + 1, text, index);
+        newText[index] = '\0';
+
+        strcat_s(newText, newLen + 1, str.text);
+
+        strcat_s(newText, newLen + 1, text + index);
+
+        delete[] text;
+        text = newText;
+
+        return *this;
+    }
+
+
+
+
+
 };
+
 
 int main() {
     SetConsoleOutputCP(1251);
@@ -121,6 +215,21 @@ int main() {
     cout << "Константний рядок: " << constStr << endl;
     cout << "Перший символ: " << constStr[0] << endl;
     cout << "Останній символ: " << constStr[constStr.size() - 1] << endl;
+    //4
+    String s4("Hello World!");
+    cout << "Оригінальний рядок: " << s4 << endl;
+    s4.replace(6, 5, "C++");
+    cout << "Після replace(6, 5, \"C++\"): " << s4 << endl;
+    String sub = s4.substr(0, 5);
+    cout << "substr(0, 5): " << sub << endl;
+    String emptyStr;
+    cout << "emptyStr.empty(): " << (emptyStr.empty() ? "true" : "false") << endl;
+    cout << "s1.empty(): " << (s4.empty() ? "true" : "false") << endl;
+    s4.insert(5, " Beautiful");
+    cout << "Після insert(5, \" Beautiful\"): " << s4 << endl;
+    String test("Програмування");
+    test.replace(0, 12, "Кодування").insert(8, " на C++");
+    cout << "Комбінований тест: " << test << endl;
 
 }
 
